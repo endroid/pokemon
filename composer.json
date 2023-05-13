@@ -1,0 +1,44 @@
+{
+    "name": "endroid/pokemon",
+    "description": "Endroid Pokemon",
+    "keywords": ["endroid", "pokemon"],
+    "homepage": "https://github.com/endroid/pokemon",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jeroen van den Enden",
+            "email": "info@endroid.nl"
+        }
+    ],
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "endroid/quality": "dev-master"
+    },
+    "suggest": {
+        "roave/security-advisories": "Avoids installation of package versions with vulnerabilities"
+    },
+    "autoload": {
+        "psr-4": {
+            "Endroid\\Pokemon\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Endroid\\Pokemon\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "endroid/installer": true
+        }
+    }
+}
