@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon;
 
-final readonly class Pokemon
+final class Pokemon
 {
     public function __construct(
-        public string $name
+        public readonly string $name
     ) {
     }
 }

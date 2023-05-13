@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon;
 
-final readonly class League
+final class League
 {
     public function __construct(
-        public string $name,
-        public int $maxCp
+        public readonly string $name,
+        public readonly int $maxCp
     ) {
     }
 }
