@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Endroid\Pokemon\Client\PoGoApiClient: ~
+    Endroid\Pokemon\Client\PvPokeClient: ~
+    Endroid\Pokemon\PokemonRepository: ~

@@ -4,31 +4,78 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon;
 
-final class PokemonRepository
+use Endroid\Pokemon\Client\PoGoApiClient;
+use Endroid\Pokemon\Client\PvPokeClient;
+use Endroid\Pokemon\Model\Iv;
+use Endroid\Pokemon\Model\League;
+use Endroid\Pokemon\Model\Level;
+use Endroid\Pokemon\Model\Pokemon;
+use Endroid\Pokemon\Model\Spawn;
+
+final readonly class PokemonRepository
 {
-    /** @return array<Pokemon>  */
-    public function findBestForLeague(League $league): array
+    public function __construct(
+        private PoGoApiClient $poGoApiClient,
+        private PvPokeClient $pvPokeClient
+    ) {
+    }
+
+    public function findAll(): PokemonCollection
     {
-        $best = [];
+        $pokemonStats = $this->poGoApiClient->getPokemonStats();
 
-        /** @var array<mixed> $data */
-        $data = json_decode((string) file_get_contents('https://pvpoke.com/data/training/analysis/all/'.$league->maxCp.'.json'), true);
-
-        foreach ($data['performers'] as $performer) {
-            $name = explode(' ', $performer['pokemon'])[0];
-            $best[$name] = new Pokemon($name);
+        $pokemonCollection = new PokemonCollection();
+        foreach ($pokemonStats as $pokemonData) {
+            $pokemonCollection->add(new Pokemon(
+                $pokemonData['pokemon_id'],
+                $pokemonData['pokemon_name'],
+                $pokemonData['base_attack'],
+                $pokemonData['base_defense'],
+                $pokemonData['base_stamina']
+            ));
         }
 
-        foreach ($data['teams'] as $team) {
-            $pokemon = explode('|', $team['team']);
-            foreach ($pokemon as $pokemonName) {
-                $name = explode(' ', $pokemonName)[0];
-                $best[$name] = new Pokemon($name);
+        foreach (League::cases() as $league) {
+            $trainingAnalysis = $this->pvPokeClient->getTrainingAnalysisForLeague($league);
+            foreach ($trainingAnalysis['performers'] as $performer) {
+                $name = explode(' ', $performer['pokemon'])[0];
+                $name = explode('_', $name)[0];
+                $pokemon = $pokemonCollection->findByName($name);
+                $spawn = $this->getBestSpawnForLeague($pokemon, $league);
+            }
+            foreach ($trainingAnalysis['teams'] as $team) {
+                $pokemon = explode('|', $team['team']);
+                foreach ($pokemon as $pokemonName) {
+                    $name = explode(' ', $pokemonName)[0];
+                    $name = explode('_', $name)[0];
+                    $pokemon = $pokemonCollection->findByName($name);
+                    $spawn = $this->getBestSpawnForLeague($pokemon, $league);
+                }
             }
         }
 
-        ksort($best);
+        return $pokemonCollection;
+    }
 
-        return $best;
+    private function getBestSpawnForLeague(Pokemon $pokemon, League $league): Spawn
+    {
+        $maxCp = 0;
+        $maxSpawn = null;
+        foreach (Level::getIterator() as $level) {
+            foreach (Iv::getIterator() as $attack) {
+                foreach (Iv::getIterator() as $defense) {
+                    foreach (Iv::getIterator() as $stamina) {
+                        $spawn = $pokemon->createSpawn($level, $attack, $defense, $stamina);
+                        $cp = $spawn->calculateCp();
+                        if ($cp > $maxCp && $cp <= $league->getMaxCp()) {
+                            $maxCp = $cp;
+                            $maxSpawn = $spawn;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $maxSpawn;
     }
 }
