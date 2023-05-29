@@ -6,7 +6,9 @@ namespace Endroid\Pokemon;
 
 use Endroid\Pokemon\Client\PoGoApiClient;
 use Endroid\Pokemon\Client\PvPokeClient;
+use Endroid\Pokemon\Model\BaseStats;
 use Endroid\Pokemon\Model\Iv;
+use Endroid\Pokemon\Model\Ivs;
 use Endroid\Pokemon\Model\League;
 use Endroid\Pokemon\Model\Level;
 use Endroid\Pokemon\Model\Pokemon;
@@ -29,9 +31,11 @@ final readonly class PokemonRepository
             $pokemonCollection->add(new Pokemon(
                 $pokemonData['pokemon_id'],
                 $pokemonData['pokemon_name'],
-                $pokemonData['base_attack'],
-                $pokemonData['base_defense'],
-                $pokemonData['base_stamina']
+                new BaseStats(
+                    $pokemonData['base_attack'],
+                    $pokemonData['base_defense'],
+                    $pokemonData['base_stamina']
+                ),
             ));
         }
 
@@ -61,17 +65,13 @@ final readonly class PokemonRepository
     {
         $maxCp = 0;
         $maxSpawn = null;
-        foreach (Level::getIterator() as $level) {
-            foreach (Iv::getIterator() as $attack) {
-                foreach (Iv::getIterator() as $defense) {
-                    foreach (Iv::getIterator() as $stamina) {
-                        $spawn = $pokemon->createSpawn($level, $attack, $defense, $stamina);
-                        $cp = $spawn->calculateCp();
-                        if ($cp > $maxCp && $cp <= $league->getMaxCp()) {
-                            $maxCp = $cp;
-                            $maxSpawn = $spawn;
-                        }
-                    }
+        foreach (Level::all() as $level) {
+            foreach (Ivs::all() as $ivs) {
+                $spawn = new Spawn($pokemon, $level, $ivs);
+                $cp = $spawn->calculateCp();
+                if ($cp > $maxCp && $cp <= $league->getMaxCp()) {
+                    $maxCp = $cp;
+                    $maxSpawn = $spawn;
                 }
             }
         }

@@ -10,9 +10,12 @@ final readonly class Level
     public function __construct(
         private int $value
     ) {
+        if ($value < self::LEVEL_MIN || $value > self::LEVEL_MAX) {
+            throw new \InvalidArgumentException(sprintf('Invalid level value "%s"', $value));
+        }
     }
 
-    public static function getIterator(): \Generator
+    public static function all(): \Generator
     {
         for ($value = self::LEVEL_MIN; $value <= self::LEVEL_MAX; $value++) {
             yield new self($value);

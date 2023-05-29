@@ -4,28 +4,22 @@ namespace Endroid\Pokemon\Model;
 
 final readonly class Spawn
 {
-    public int $attack;
-    public int $defense;
-    public int $stamina;
+    public Stats $stats;
 
     public function __construct(
         public Pokemon $pokemon,
         public Level $level,
-        public Iv $ivAttack,
-        public Iv $ivDefense,
-        public Iv $ivStamina
+        public Ivs $ivs
     ) {
-        $this->attack = $this->pokemon->baseAttack + $ivAttack->value;
-        $this->defense = $this->pokemon->baseDefense + $ivDefense->value;
-        $this->stamina = $this->pokemon->baseStamina + $ivStamina->value;
+        $this->stats = new Stats($this->pokemon->baseStats, $this->ivs);
     }
 
     public function calculateCp(): int
     {
         $scalarFactor = pow($this->level->getCpScalar(), 2);
-        $attackFactor = $this->attack;
-        $defenseFactor = pow($this->defense, 0.5);
-        $staminaFactor = pow($this->stamina, 0.5);
+        $attackFactor = $this->stats->attack;
+        $defenseFactor = pow($this->stats->defense, 0.5);
+        $staminaFactor = pow($this->stats->stamina, 0.5);
 
         return (int) floor($attackFactor * $defenseFactor * $staminaFactor * $scalarFactor / 10);
     }
@@ -33,9 +27,9 @@ final readonly class Spawn
     public function calculateProductAbsolute(): int
     {
         $scalarFactor = $this->level->getCpScalar();
-        $attackFactor = $this->attack * $scalarFactor;
-        $defenseFactor = $this->defense * $scalarFactor;
-        $staminaFactor = $this->stamina * $scalarFactor;
+        $attackFactor = $this->stats->attack * $scalarFactor;
+        $defenseFactor = $this->stats->defense * $scalarFactor;
+        $staminaFactor = $this->stats->stamina * $scalarFactor;
 
         dump($attackFactor);
         dump($defenseFactor);
