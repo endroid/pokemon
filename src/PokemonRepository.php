@@ -76,6 +76,9 @@ final readonly class PokemonRepository
             }
         }
 
+        dump($maxSpawn);
+        die;
+
         return $maxSpawn;
     }
 }
