@@ -11,7 +11,7 @@ final class MunchlaxClient
 {
     public function getCalendar(): Calendar
     {
-        $skipTitles = ['Season '];
+        $skipTitles = ['Season ', ' Special Research'];
         $skipCategories = ['Go Battle League', 'Research Breakthrough'];
 
         $crawler = new Crawler((string) file_get_contents('https://www.munchlax.nl/'));
