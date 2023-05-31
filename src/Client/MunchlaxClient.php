@@ -12,7 +12,7 @@ final class MunchlaxClient
     public function getCalendar(): Calendar
     {
         $skipTitles = ['Season ', ' Special Research'];
-        $skipCategories = ['Go Battle League', 'Research Breakthrough'];
+        $skipCategories = ['Go Battle League', 'Research Breakthrough', 'Research Breaktrough'];
 
         $crawler = new Crawler((string) file_get_contents('https://www.munchlax.nl/'));
         $events = $crawler->filter('.list-group-item')->each(function (Crawler $node) use ($skipTitles, $skipCategories) {
@@ -36,8 +36,8 @@ final class MunchlaxClient
                 Uuid::v6(),
                 $title,
                 '',
-                (new \DateTimeImmutable($dateStart, $dateTimeZone))->setTime(0, 0, 0),
-                (new \DateTimeImmutable($dateEnd, $dateTimeZone))->setTime(0, 0, 0)
+                (new \DateTimeImmutable($dateStart, $dateTimeZone)),
+                (new \DateTimeImmutable($dateEnd, $dateTimeZone))
             );
         });
 
