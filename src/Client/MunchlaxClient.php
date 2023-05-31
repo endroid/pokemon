@@ -36,8 +36,8 @@ final class MunchlaxClient
                 Uuid::v6(),
                 $title,
                 '',
-                (new \DateTimeImmutable($dateStart, $dateTimeZone)),
-                (new \DateTimeImmutable($dateEnd, $dateTimeZone))
+                (new \DateTimeImmutable($dateStart, $dateTimeZone))->setTime(0, 0, 0),
+                (new \DateTimeImmutable($dateEnd, $dateTimeZone))->setTime(0, 0, 0)
             );
         });
 
