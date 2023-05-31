@@ -21,8 +21,8 @@ final class MunchlaxClient
                 Uuid::v6(),
                 $title,
                 '',
-                new \DateTimeImmutable($dateStart),
-                new \DateTimeImmutable($dateEnd)
+                (new \DateTimeImmutable($dateStart))->setTime(0, 0, 0),
+                (new \DateTimeImmutable($dateEnd))->setTime(0, 0, 0),
             );
         });
 
