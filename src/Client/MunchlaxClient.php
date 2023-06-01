@@ -31,11 +31,12 @@ final class MunchlaxClient
             $dates = $node->filter('.footer')->innerText();
             [$dateStart, $dateEnd] = explode(' → ', trim($dates, '()'));
             $dateTimeZone = new \DateTimeZone('Europe/Amsterdam');
+            $link = 'https://www.munchlax.nl/'.$node->filter('a')->attr('href');
 
             return new CalendarItem(
                 Uuid::v6(),
                 $title,
-                '',
+                $link,
                 (new \DateTimeImmutable($dateStart, $dateTimeZone)),
                 (new \DateTimeImmutable($dateEnd, $dateTimeZone))
             );
