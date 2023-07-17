@@ -19,18 +19,17 @@ final readonly class LeekDuckClient
 
     public function getCalendar(): Calendar
     {
-        $skipTitles = [];
-        $skipCategories = ['GO Battle League'];
+        $skipCategories = ['GO Battle League', 'Season', 'Research Breakthrough'];
 
-        $crawler = new Crawler((string) file_get_contents('https://leekduck.com/events/'));
+        $asset = $this->assetFactory->create(null, [
+            'url' => 'https://leekduck.com/events/',
+            'cache_key' => 'leekduck-event-overview',
+            'cache_expires_after' => 60 * 60 * 6,
+        ]);
+
+        $crawler = new Crawler($asset->getData());
 
         $eventUrls = $crawler->filter('.event-item-link')->each(function (Crawler $node) use ($skipCategories) {
-//            foreach ($skipTitles as $skipTitle) {
-//                if (str_contains($title, $skipTitle)) {
-//                    return null;
-//                }
-//            }
-
             $category = $node->filter('p')->innerText();
             foreach ($skipCategories as $skipCategory) {
                 if (strtolower($skipCategory) === strtolower($category)) {
@@ -43,14 +42,17 @@ final readonly class LeekDuckClient
 
         $eventUrls = array_filter($eventUrls);
 
-        $events = [];
-        foreach ($eventUrls as $eventUrl) {
-            $asset = $this->assetFactory->create(null, [
-                'url' => $eventUrl,
-                'cache_key' => 'leekduck-'.md5($eventUrl),
-            ]);
+        $asset = $this->assetFactory->create(null, [
+            'urls' => array_combine($eventUrls, $eventUrls),
+            'cache_key' => 'leekduck-event-details',
+            'cache_expires_after' => 60 * 60 * 6,
+        ]);
 
-            $crawler = new Crawler($asset->getData());
+        $assetData = unserialize($asset->getData());
+
+        $events = [];
+        foreach ($eventUrls as $assetUrl) {
+            $crawler = new Crawler($assetData[$assetUrl]);
             $title = $crawler->filter('.page-title')->innerText();
             $dateStart = $crawler->filter('#event-date-start')->innerText();
             $timeStart = $crawler->filter('#event-time-start')->innerText();
@@ -64,7 +66,7 @@ final readonly class LeekDuckClient
                 $events[] = new CalendarItem(
                     (string) Uuid::v6(),
                     $title,
-                    $eventUrl,
+                    $assetUrl,
                     $dateTimeStart,
                     $dateTimeEnd
                 );
