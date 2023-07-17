@@ -4,6 +4,7 @@ services:
         autoconfigure: true
         public: false
 
+    Endroid\Pokemon\Client\LeekDuckClient: ~
     Endroid\Pokemon\Client\MunchlaxClient: ~
     Endroid\Pokemon\Client\PoGoApiClient: ~
     Endroid\Pokemon\Client\PvPokeClient: ~
