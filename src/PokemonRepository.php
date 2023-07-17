@@ -7,7 +7,6 @@ namespace Endroid\Pokemon;
 use Endroid\Pokemon\Client\PoGoApiClient;
 use Endroid\Pokemon\Client\PvPokeClient;
 use Endroid\Pokemon\Model\BaseStats;
-use Endroid\Pokemon\Model\Iv;
 use Endroid\Pokemon\Model\Ivs;
 use Endroid\Pokemon\Model\League;
 use Endroid\Pokemon\Model\Level;
@@ -77,7 +76,7 @@ final readonly class PokemonRepository
         }
 
         dump($maxSpawn);
-        die;
+        exit;
 
         return $maxSpawn;
     }

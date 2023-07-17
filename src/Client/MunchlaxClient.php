@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Endroid\Pokemon\Client;
 
 use Endroid\Calendar\Model\Calendar;
@@ -37,7 +39,7 @@ final class MunchlaxClient
             $dateTimeZone = new \DateTimeZone('Europe/Amsterdam');
 
             return new CalendarItem(
-                Uuid::v6(),
+                (string) Uuid::v6(),
                 $title,
                 $liveEventUrl,
                 \DateTimeImmutable::createFromFormat('d-m-y H:i', $dateStart, $dateTimeZone),

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Endroid\Pokemon\Model;
 
 final readonly class Level
@@ -17,14 +19,14 @@ final readonly class Level
 
     public static function all(): \Generator
     {
-        for ($value = self::LEVEL_MIN; $value <= self::LEVEL_MAX; $value++) {
+        for ($value = self::LEVEL_MIN; $value <= self::LEVEL_MAX; ++$value) {
             yield new self($value);
         }
     }
 
     public function getCpScalar(): float
     {
-        return match($this->value) {
+        return match ($this->value) {
             1 => 0.094,
             2 => 0.16639787,
             3 => 0.21573247,

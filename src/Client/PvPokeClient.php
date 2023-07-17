@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Endroid\Pokemon\Client;
 
 use Endroid\Pokemon\Model\League;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Endroid\Pokemon\Model;
 
 final readonly class Iv
@@ -17,7 +19,7 @@ final readonly class Iv
 
     public static function all(): \Generator
     {
-        for ($value = self::IV_MIN; $value <= self::IV_MAX; $value++) {
+        for ($value = self::IV_MIN; $value <= self::IV_MAX; ++$value) {
             yield new self($value);
         }
     }
