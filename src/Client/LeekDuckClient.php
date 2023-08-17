@@ -19,7 +19,8 @@ final readonly class LeekDuckClient
 
     public function getCalendar(): Calendar
     {
-        $skipCategories = ['GO Battle League', 'Season', 'Research Breakthrough'];
+        $skipCategories = ['GO Battle League', 'Season', 'Research Breakthrough', 'Update'];
+        $skipTitles = ['Amazon'];
 
         $asset = $this->assetFactory->create(null, [
             'url' => 'https://leekduck.com/events/',
@@ -54,6 +55,11 @@ final readonly class LeekDuckClient
         foreach ($eventUrls as $assetUrl) {
             $crawler = new Crawler($assetData[$assetUrl]);
             $title = $crawler->filter('.page-title')->innerText();
+            foreach ($skipTitles as $skipTitle) {
+                if (str_contains($title, $skipTitle)) {
+                    continue 2;
+                }
+            }
             $dateStart = $crawler->filter('#event-date-start')->innerText();
             $timeStart = $crawler->filter('#event-time-start')->innerText();
             $dateEnd = $crawler->filter('#event-date-end')->innerText();
@@ -70,7 +76,8 @@ final readonly class LeekDuckClient
                     $dateTimeStart,
                     $dateTimeEnd
                 );
-            } catch (\Throwable) {}
+            } catch (\Throwable) {
+            }
         }
 
         return new Calendar('Pokemon Go', $events);

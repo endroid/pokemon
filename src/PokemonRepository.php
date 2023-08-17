@@ -7,11 +7,9 @@ namespace Endroid\Pokemon;
 use Endroid\Pokemon\Client\PoGoApiClient;
 use Endroid\Pokemon\Client\PvPokeClient;
 use Endroid\Pokemon\Model\BaseStats;
-use Endroid\Pokemon\Model\Ivs;
 use Endroid\Pokemon\Model\League;
-use Endroid\Pokemon\Model\Level;
 use Endroid\Pokemon\Model\Pokemon;
-use Endroid\Pokemon\Model\Spawn;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class PokemonRepository
 {
@@ -30,6 +28,7 @@ final readonly class PokemonRepository
             $pokemonCollection->add(new Pokemon(
                 $pokemonData['pokemon_id'],
                 $pokemonData['pokemon_name'],
+                str_replace('Alola', 'Alolan', $pokemonData['form']),
                 new BaseStats(
                     $pokemonData['base_attack'],
                     $pokemonData['base_defense'],
@@ -39,45 +38,45 @@ final readonly class PokemonRepository
         }
 
         foreach (League::cases() as $league) {
-            $trainingAnalysis = $this->pvPokeClient->getTrainingAnalysisForLeague($league);
-            foreach ($trainingAnalysis['performers'] as $performer) {
-                $name = explode(' ', $performer['pokemon'])[0];
-                $name = explode('_', $name)[0];
-                $pokemon = $pokemonCollection->findByName($name);
-                $spawn = $this->getBestSpawnForLeague($pokemon, $league);
-            }
-            foreach ($trainingAnalysis['teams'] as $team) {
-                $pokemon = explode('|', $team['team']);
-                foreach ($pokemon as $pokemonName) {
-                    $name = explode(' ', $pokemonName)[0];
-                    $name = explode('_', $name)[0];
-                    $pokemon = $pokemonCollection->findByName($name);
-                    $spawn = $this->getBestSpawnForLeague($pokemon, $league);
+            $rankings = $this->pvPokeClient->getRankingsForLeague($league);
+            foreach ($rankings as $index => $ranking) {
+                $nameParts = explode(' (', $ranking['speciesName']);
+                $name = $nameParts[0];
+                $form = isset($nameParts[1]) ? trim($nameParts[1], ')') : 'normal';
+                if ('Shadow' === $form) {
+                    continue;
+                }
+                try {
+                    $pokemon = $pokemonCollection->find($name, $form);
+                    $pokemon->leagueInfo[$league->name] = [
+                        'rank' => $index + 1,
+                        'score' => $ranking['score'],
+                        'moves' => $ranking['moveset'],
+                    ];
+                } catch (NotFoundHttpException) {
+                    // Skip the item
                 }
             }
+
+//            $trainingAnalysis = $this->pvPokeClient->getTrainingAnalysisForLeague($league);
+//            foreach ($trainingAnalysis['performers'] as $performer) {
+//                $name = explode(' ', $performer['pokemon'])[0];
+//                $pokemon = $pokemonCollection->findByName($name);
+//                dump($trainingAnalysis['performers']);
+//                die;
+//            }
+//            foreach ($trainingAnalysis['teams'] as $team) {
+//                $pokemon = explode('|', $team['team']);
+//                foreach ($pokemon as $pokemonName) {
+//                    $name = explode(' ', $pokemonName)[0];
+//                    $name = explode('_', $name)[0];
+//                    dump($name);
+//                    $pokemon = $pokemonCollection->findByName($name);
+            // //
+//                }
+//            }
         }
 
         return $pokemonCollection;
-    }
-
-    private function getBestSpawnForLeague(Pokemon $pokemon, League $league): Spawn
-    {
-        $maxCp = 0;
-        $maxSpawn = null;
-        foreach (Level::all() as $level) {
-            foreach (Ivs::all() as $ivs) {
-                $spawn = new Spawn($pokemon, $level, $ivs);
-                $cp = $spawn->calculateCp();
-                if ($cp > $maxCp && $cp <= $league->getMaxCp()) {
-                    $maxCp = $cp;
-                    $maxSpawn = $spawn;
-                }
-            }
-        }
-
-        dump($maxSpawn);
-        exit;
-
-        return $maxSpawn;
     }
 }

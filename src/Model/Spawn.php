@@ -16,7 +16,7 @@ final readonly class Spawn
         $this->stats = new Stats($this->pokemon->baseStats, $this->ivs);
     }
 
-    public function calculateCp(): int
+    public function getCp(): int
     {
         $scalarFactor = pow($this->level->getCpScalar(), 2);
         $attackFactor = $this->stats->attack;
@@ -26,16 +26,12 @@ final readonly class Spawn
         return (int) floor($attackFactor * $defenseFactor * $staminaFactor * $scalarFactor / 10);
     }
 
-    public function calculateProductAbsolute(): int
+    public function getStatProduct(): float
     {
         $scalarFactor = $this->level->getCpScalar();
         $attackFactor = $this->stats->attack * $scalarFactor;
         $defenseFactor = $this->stats->defense * $scalarFactor;
-        $staminaFactor = $this->stats->stamina * $scalarFactor;
-
-        dump($attackFactor);
-        dump($defenseFactor);
-        dump($staminaFactor);
+        $staminaFactor = floor($this->stats->stamina * $scalarFactor);
 
         return $attackFactor * $defenseFactor * $staminaFactor;
     }

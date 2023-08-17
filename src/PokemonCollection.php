@@ -5,47 +5,46 @@ declare(strict_types=1);
 namespace Endroid\Pokemon;
 
 use Endroid\Pokemon\Model\Pokemon;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class PokemonCollection implements \IteratorAggregate
 {
-    private array $pokemonByNumber = [];
-    private array $pokemonByNameKey = [];
+    private array $pokemonByNameAndForm = [];
 
     public function add(Pokemon $pokemon): void
     {
-        $this->pokemonByNumber[$pokemon->number] = $pokemon;
-        $this->pokemonByNameKey[$this->createNameKey($pokemon->name)] = $pokemon;
+        $this->pokemonByNameAndForm[$this->createNameKey($pokemon->name)][$this->createFormKey($pokemon->form)] = $pokemon;
     }
 
-    public function findByNumber(int $number): Pokemon
+    public function find(string $name, string $form): Pokemon
     {
-        $pokemon = $this->pokemonByNumber[$number] ?? null;
+        $pokemon = $this->pokemonByNameAndForm[$this->createNameKey($name)][$this->createFormKey($form)] ?? null;
 
         if (!$pokemon instanceof Pokemon) {
-            throw new \Exception(sprintf('Pokemon with number "%s" not found', $number));
+            throw new NotFoundHttpException(sprintf('Pokemon with name "%s" and form "%s" not found', $name, $form));
         }
 
         return $pokemon;
     }
 
-    public function findByName(string $name): Pokemon
+    public function getIterator(): \Generator
     {
-        $pokemon = $this->pokemonByNameKey[$this->createNameKey($name)] ?? null;
-
-        if (!$pokemon instanceof Pokemon) {
-            throw new \Exception(sprintf('Pokemon with name "%s" not found', $name));
+        foreach ($this->pokemonByNameAndForm as $pokemonByForm) {
+            foreach ($pokemonByForm as $pokemon) {
+                yield $pokemon;
+            }
         }
-
-        return $pokemon;
-    }
-
-    public function getIterator(): \ArrayIterator
-    {
-        return new \ArrayIterator($this->pokemonByNumber);
     }
 
     private function createNameKey(string $name): string
     {
         return preg_replace('#[^a-z]#', '', strtolower($name));
+    }
+
+    private function createFormKey(string $form): string
+    {
+        $key = preg_replace('#[^a-z]#', '', strtolower($form));
+
+        return preg_replace(['#^alola$#'], ['alolan'], $key);
     }
 }

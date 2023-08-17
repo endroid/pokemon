@@ -23,4 +23,9 @@ final readonly class Iv
             yield new self($value);
         }
     }
+
+    public static function max(): self
+    {
+        return new self(self::IV_MAX);
+    }
 }
