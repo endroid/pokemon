@@ -25,7 +25,7 @@ final readonly class LeekDuckClient
         $asset = $this->assetFactory->create(null, [
             'url' => 'https://leekduck.com/events/',
             'cache_key' => 'leekduck-event-overview',
-            'cache_expires_after' => 60 * 60 * 6,
+            'cache_expires_after' => 86400,
         ]);
 
         $crawler = new Crawler($asset->getData());
@@ -46,7 +46,7 @@ final readonly class LeekDuckClient
         $asset = $this->assetFactory->create(null, [
             'urls' => array_combine($eventUrls, $eventUrls),
             'cache_key' => 'leekduck-event-details',
-            'cache_expires_after' => 60 * 60 * 6,
+            'cache_expires_after' => 86400,
         ]);
 
         $assetData = unserialize($asset->getData());

@@ -21,10 +21,14 @@ final readonly class PokemonRepository
 
     public function findAll(): PokemonCollection
     {
+        $releasedPokemon = $this->poGoApiClient->getReleasedPokemon();
         $pokemonStats = $this->poGoApiClient->getPokemonStats();
 
         $pokemonCollection = new PokemonCollection();
         foreach ($pokemonStats as $pokemonData) {
+            if (!isset($releasedPokemon[$pokemonData['pokemon_id']])) {
+                continue;
+            }
             $pokemonCollection->add(new Pokemon(
                 $pokemonData['pokemon_id'],
                 $pokemonData['pokemon_name'],
@@ -58,23 +62,23 @@ final readonly class PokemonRepository
                 }
             }
 
-//            $trainingAnalysis = $this->pvPokeClient->getTrainingAnalysisForLeague($league);
-//            foreach ($trainingAnalysis['performers'] as $performer) {
-//                $name = explode(' ', $performer['pokemon'])[0];
-//                $pokemon = $pokemonCollection->findByName($name);
-//                dump($trainingAnalysis['performers']);
-//                die;
-//            }
-//            foreach ($trainingAnalysis['teams'] as $team) {
-//                $pokemon = explode('|', $team['team']);
-//                foreach ($pokemon as $pokemonName) {
-//                    $name = explode(' ', $pokemonName)[0];
-//                    $name = explode('_', $name)[0];
-//                    dump($name);
-//                    $pokemon = $pokemonCollection->findByName($name);
+            //            $trainingAnalysis = $this->pvPokeClient->getTrainingAnalysisForLeague($league);
+            //            foreach ($trainingAnalysis['performers'] as $performer) {
+            //                $name = explode(' ', $performer['pokemon'])[0];
+            //                $pokemon = $pokemonCollection->findByName($name);
+            //                dump($trainingAnalysis['performers']);
+            //                die;
+            //            }
+            //            foreach ($trainingAnalysis['teams'] as $team) {
+            //                $pokemon = explode('|', $team['team']);
+            //                foreach ($pokemon as $pokemonName) {
+            //                    $name = explode(' ', $pokemonName)[0];
+            //                    $name = explode('_', $name)[0];
+            //                    dump($name);
+            //                    $pokemon = $pokemonCollection->findByName($name);
             // //
-//                }
-//            }
+            //                }
+            //            }
         }
 
         return $pokemonCollection;

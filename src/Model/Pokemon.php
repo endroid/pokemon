@@ -37,7 +37,7 @@ final class Pokemon
                     continue;
                 }
                 $statProduct = $spawn->getStatProduct();
-                if ($statProduct > $bestStatProduct) {
+                if ($statProduct >= $bestStatProduct) {
                     $bestSpawn = $spawn;
                     $bestStatProduct = $statProduct;
                 }
