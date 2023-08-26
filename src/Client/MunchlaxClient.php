@@ -35,15 +35,21 @@ final class MunchlaxClient
             }
 
             $dates = $liveEventCrawler->filter('.sub')->innerText();
-            [$dateStart, $dateEnd] = explode(' → ', trim($dates, '()'));
+            [$dateStartString, $dateEndString] = explode(' → ', trim($dates, '()'));
             $dateTimeZone = new \DateTimeZone('Europe/Amsterdam');
+
+            /** @var \DateTimeImmutable $dateStart */
+            $dateStart = \DateTimeImmutable::createFromFormat('d-m-y H:i', $dateStartString, $dateTimeZone);
+
+            /** @var \DateTimeImmutable $dateEnd */
+            $dateEnd = \DateTimeImmutable::createFromFormat('d-m-y H:i', $dateEndString, $dateTimeZone);
 
             return new CalendarItem(
                 (string) Uuid::v6(),
                 $title,
                 $liveEventUrl,
-                \DateTimeImmutable::createFromFormat('d-m-y H:i', $dateStart, $dateTimeZone),
-                \DateTimeImmutable::createFromFormat('d-m-y H:i', $dateEnd, $dateTimeZone)
+                $dateStart,
+                $dateEnd
             );
         });
 
@@ -61,16 +67,22 @@ final class MunchlaxClient
                 }
             }
             $dates = $node->filter('.footer')->innerText();
-            [$dateStart, $dateEnd] = explode(' → ', trim($dates, '()'));
+            [$dateStartString, $dateEndString] = explode(' → ', trim($dates, '()'));
             $dateTimeZone = new \DateTimeZone('Europe/Amsterdam');
             $link = 'https://www.munchlax.nl/'.$node->filter('a')->attr('href');
 
+            /** @var \DateTimeImmutable $dateStart */
+            $dateStart = \DateTimeImmutable::createFromFormat('d-m-Y H:i', $dateStartString, $dateTimeZone);
+
+            /** @var \DateTimeImmutable $dateEnd */
+            $dateEnd = \DateTimeImmutable::createFromFormat('d-m-Y H:i', $dateEndString, $dateTimeZone);
+
             return new CalendarItem(
-                Uuid::v6(),
+                (string) Uuid::v6(),
                 $title,
                 $link,
-                \DateTimeImmutable::createFromFormat('d-m-Y H:i', $dateStart, $dateTimeZone),
-                \DateTimeImmutable::createFromFormat('d-m-Y H:i', $dateEnd, $dateTimeZone)
+                $dateStart,
+                $dateEnd
             );
         });
 

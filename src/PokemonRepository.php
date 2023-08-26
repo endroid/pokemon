@@ -6,11 +6,11 @@ namespace Endroid\Pokemon;
 
 use Endroid\Pokemon\Client\PoGoApiClient;
 use Endroid\Pokemon\Client\PvPokeClient;
+use Endroid\Pokemon\Exception\NotFoundException;
 use Endroid\Pokemon\Model\BaseStats;
 use Endroid\Pokemon\Model\League;
 use Endroid\Pokemon\Model\Pokemon;
 use Endroid\Pokemon\Model\Type;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class PokemonRepository
 {
@@ -61,7 +61,7 @@ final readonly class PokemonRepository
                         'rank' => $index + 1,
                         'score' => $ranking['score'],
                     ];
-                } catch (NotFoundHttpException) {
+                } catch (NotFoundException) {
                     // Skip the item
                 }
             }

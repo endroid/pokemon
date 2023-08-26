@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon;
 
+use Endroid\Pokemon\Exception\NotFoundException;
 use Endroid\Pokemon\Model\BaseStats;
 use Endroid\Pokemon\Model\Pokemon;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-final class PokemonCollection implements \IteratorAggregate
+final class PokemonCollection
 {
+    /** @var array<array<Pokemon>> */
     private array $pokemonByNameAndForm = [];
 
     public function add(Pokemon $pokemon): void
@@ -37,7 +38,7 @@ final class PokemonCollection implements \IteratorAggregate
         $pokemon = $this->pokemonByNameAndForm[$this->createNameKey($name)][$this->createFormKey($form)] ?? null;
 
         if (!$pokemon instanceof Pokemon) {
-            throw new NotFoundHttpException(sprintf('Pokemon with name "%s" and form "%s" not found', $name, $form));
+            throw new NotFoundException(sprintf('Pokemon with name "%s" and form "%s" not found', $name, $form));
         }
 
         return $pokemon;
@@ -54,13 +55,13 @@ final class PokemonCollection implements \IteratorAggregate
 
     private function createNameKey(string $name): string
     {
-        return preg_replace('#[^a-z]#', '', strtolower($name));
+        return (string) preg_replace('#[^a-z]#', '', strtolower($name));
     }
 
     private function createFormKey(string $form): string
     {
         $key = preg_replace('#[^a-z]#', '', strtolower($form));
 
-        return preg_replace(['#^alola$#'], ['alolan'], $key);
+        return (string) preg_replace(['#^alola$#'], ['alolan'], (string) $key);
     }
 }

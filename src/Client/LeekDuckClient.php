@@ -41,7 +41,7 @@ final readonly class LeekDuckClient
             return 'https://leekduck.com'.$node->attr('href');
         });
 
-        $eventUrls = array_filter($eventUrls);
+        $eventUrls = array_unique(array_filter($eventUrls));
 
         $asset = $this->assetFactory->create(null, [
             'urls' => array_combine($eventUrls, $eventUrls),
@@ -88,10 +88,13 @@ final readonly class LeekDuckClient
         $extractedDate = trim($dateString, ',');
         preg_match('#[0-9]+:[0-9]+ (AM|PM)#', $timeString, $extractedTime);
 
-        return \DateTimeImmutable::createFromFormat(
+        /** @var \DateTimeImmutable $dateTime */
+        $dateTime = \DateTimeImmutable::createFromFormat(
             'l, F j H:i A',
             $extractedDate.' '.$extractedTime[0],
             new \DateTimeZone('Europe/Amsterdam')
         );
+
+        return $dateTime;
     }
 }

@@ -10,10 +10,11 @@ use Endroid\Pokemon\Model\League;
 final class PvPokeClient
 {
     public function __construct(
-        private AssetFactory $assetFactory
+        private readonly AssetFactory $assetFactory
     ) {
     }
 
+    /** @return array<mixed> */
     public function getRankingsForLeague(League $league, int $limit): array
     {
         $cacheAsset = $this->assetFactory->create(null, [
@@ -32,6 +33,7 @@ final class PvPokeClient
         return array_slice($rankings, 0, $limit);
     }
 
+    /** @return array<mixed> */
     public function getTrainingAnalysisForLeague(League $league): array
     {
         $cacheAsset = $this->assetFactory->create(null, [

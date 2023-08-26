@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon\Model;
 
+use Endroid\Pokemon\Exception\NotFoundException;
+
 final class Pokemon
 {
+    /**
+     * @param array<Type>  $types
+     * @param array<mixed> $leagueInfo
+     */
     public function __construct(
         public readonly int $number,
         public readonly string $name,
@@ -52,6 +58,10 @@ final class Pokemon
                     $bestStatProduct = $statProduct;
                 }
             }
+        }
+
+        if (!$bestSpawn instanceof Spawn) {
+            throw new NotFoundException(sprintf('No perfect spawn found for league "%s"', $league->value));
         }
 
         return $bestSpawn;

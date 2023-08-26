@@ -13,26 +13,31 @@ final class PoGoApiClient
     ) {
     }
 
+    /** @return array<mixed> */
     public function getPokemonStats(): array
     {
         return $this->doRequest('pokemon_stats');
     }
 
+    /** @return array<mixed> */
     public function getReleasedPokemon(): array
     {
         return $this->doRequest('released_pokemon');
     }
 
+    /** @return array<mixed> */
     public function getPokemonTypes(): array
     {
         return $this->doRequest('pokemon_types');
     }
 
+    /** @return array<mixed> */
     public function getMegas(): array
     {
         return $this->doRequest('mega_pokemon');
     }
 
+    /** @return array<mixed> */
     public function doRequest(string $path): array
     {
         $cacheAsset = $this->assetFactory->create(null, [
