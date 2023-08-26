@@ -10,6 +10,7 @@ final class Pokemon
         public readonly int $number,
         public readonly string $name,
         public readonly string $form,
+        public readonly array $types,
         public readonly BaseStats $baseStats,
         public array $leagueInfo = []
     ) {
@@ -27,13 +28,22 @@ final class Pokemon
 
     public function getPerfectSpawnForLeague(League $league): Spawn
     {
+        if (League::Master === $league) {
+            return $this->createSpawn(Level::max(), Ivs::max());
+        }
+
         $bestSpawn = null;
         $bestStatProduct = 0;
         foreach (Level::all() as $level) {
             foreach (Ivs::all() as $ivs) {
+                if ($ivs->defense->value < 11 || $ivs->stamina->value < 11) {
+                    continue;
+                }
+                if ($ivs->attack->value > $ivs->defense->value || $ivs->attack->value > $ivs->stamina->value) {
+                    continue;
+                }
                 $spawn = new Spawn($this, $level, $ivs);
-                $cp = $spawn->getCp();
-                if ($cp > $league->getMaxCp()) {
+                if ($spawn->getCp() > $league->getMaxCp()) {
                     continue;
                 }
                 $statProduct = $spawn->getStatProduct();

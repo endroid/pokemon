@@ -14,7 +14,7 @@ final class PvPokeClient
     ) {
     }
 
-    public function getRankingsForLeague(League $league): array
+    public function getRankingsForLeague(League $league, int $limit): array
     {
         $cacheAsset = $this->assetFactory->create(null, [
             'url' => 'https://pvpoke.com/data/rankings/all/overall/rankings-'.$league->getMaxCp().'.json',
@@ -29,7 +29,7 @@ final class PvPokeClient
             throw new \RuntimeException('Could not fetch league rankings');
         }
 
-        return $rankings;
+        return array_slice($rankings, 0, $limit);
     }
 
     public function getTrainingAnalysisForLeague(League $league): array

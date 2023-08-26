@@ -23,9 +23,9 @@ final class PoGoApiClient
         return $this->doRequest('released_pokemon');
     }
 
-    public function getCpMultipliers(): array
+    public function getPokemonTypes(): array
     {
-        return $this->doRequest('cp_multiplier');
+        return $this->doRequest('pokemon_types');
     }
 
     public function getMegas(): array

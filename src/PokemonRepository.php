@@ -9,6 +9,7 @@ use Endroid\Pokemon\Client\PvPokeClient;
 use Endroid\Pokemon\Model\BaseStats;
 use Endroid\Pokemon\Model\League;
 use Endroid\Pokemon\Model\Pokemon;
+use Endroid\Pokemon\Model\Type;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class PokemonRepository
@@ -23,6 +24,7 @@ final readonly class PokemonRepository
     {
         $releasedPokemon = $this->poGoApiClient->getReleasedPokemon();
         $pokemonStats = $this->poGoApiClient->getPokemonStats();
+        $pokemonTypes = array_column($this->poGoApiClient->getPokemonTypes(), 'type', 'pokemon_id');
 
         $pokemonCollection = new PokemonCollection();
         foreach ($pokemonStats as $pokemonData) {
@@ -32,7 +34,8 @@ final readonly class PokemonRepository
             $pokemonCollection->add(new Pokemon(
                 $pokemonData['pokemon_id'],
                 $pokemonData['pokemon_name'],
-                str_replace('Alola', 'Alolan', $pokemonData['form']),
+                str_replace(['_', 'Alola'], [' ', 'Alolan'], $pokemonData['form']),
+                array_map(fn (string $type) => Type::from(strtolower($type)), $pokemonTypes[$pokemonData['pokemon_id']]),
                 new BaseStats(
                     $pokemonData['base_attack'],
                     $pokemonData['base_defense'],
@@ -41,8 +44,10 @@ final readonly class PokemonRepository
             ));
         }
 
+        $pokemonCollection->removeDuplicates();
+
         foreach (League::cases() as $league) {
-            $rankings = $this->pvPokeClient->getRankingsForLeague($league);
+            $rankings = $this->pvPokeClient->getRankingsForLeague($league, 100);
             foreach ($rankings as $index => $ranking) {
                 $nameParts = explode(' (', $ranking['speciesName']);
                 $name = $nameParts[0];
@@ -55,30 +60,11 @@ final readonly class PokemonRepository
                     $pokemon->leagueInfo[$league->name] = [
                         'rank' => $index + 1,
                         'score' => $ranking['score'],
-                        'moves' => $ranking['moveset'],
                     ];
                 } catch (NotFoundHttpException) {
                     // Skip the item
                 }
             }
-
-            //            $trainingAnalysis = $this->pvPokeClient->getTrainingAnalysisForLeague($league);
-            //            foreach ($trainingAnalysis['performers'] as $performer) {
-            //                $name = explode(' ', $performer['pokemon'])[0];
-            //                $pokemon = $pokemonCollection->findByName($name);
-            //                dump($trainingAnalysis['performers']);
-            //                die;
-            //            }
-            //            foreach ($trainingAnalysis['teams'] as $team) {
-            //                $pokemon = explode('|', $team['team']);
-            //                foreach ($pokemon as $pokemonName) {
-            //                    $name = explode(' ', $pokemonName)[0];
-            //                    $name = explode('_', $name)[0];
-            //                    dump($name);
-            //                    $pokemon = $pokemonCollection->findByName($name);
-            // //
-            //                }
-            //            }
         }
 
         return $pokemonCollection;
