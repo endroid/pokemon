@@ -8,7 +8,10 @@ use Endroid\Pokemon\Exception\NotFoundException;
 use Endroid\Pokemon\Model\BaseStats;
 use Endroid\Pokemon\Model\Pokemon;
 
-final class PokemonCollection
+/**
+ * @phpstan-implements \IteratorAggregate<Pokemon>
+ */
+final class PokemonCollection implements \IteratorAggregate
 {
     /** @var array<array<Pokemon>> */
     private array $pokemonByNameAndForm = [];
