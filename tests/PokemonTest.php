@@ -8,10 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 final class PokemonTest extends TestCase
 {
-    /**
-     * @testdox No tests yet
-     */
-    public function testNoTestsYet()
+    public function testNoTestsYet(): void
     {
         $this->assertTrue(true);
     }

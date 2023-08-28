@@ -9,7 +9,7 @@ use Endroid\Asset\Factory\AssetFactory;
 final class PoGoApiClient
 {
     public function __construct(
-        private AssetFactory $assetFactory
+        private readonly AssetFactory $assetFactory
     ) {
     }
 

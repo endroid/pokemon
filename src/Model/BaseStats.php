@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon\Model;
 
-final readonly class BaseStats
+final class BaseStats
 {
     public function __construct(
-        public int $attack,
-        public int $defense,
-        public int $stamina
+        public readonly int $attack,
+        public readonly int $defense,
+        public readonly int $stamina
     ) {
     }
 

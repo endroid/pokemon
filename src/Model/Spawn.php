@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon\Model;
 
-final readonly class Spawn
+final class Spawn
 {
-    public Stats $stats;
+    public readonly Stats $stats;
 
     public function __construct(
-        public Pokemon $pokemon,
-        public Level $level,
-        public Ivs $ivs
+        public readonly Pokemon $pokemon,
+        public readonly Level $level,
+        public readonly Ivs $ivs
     ) {
         $this->stats = new Stats($this->pokemon->baseStats, $this->ivs);
     }

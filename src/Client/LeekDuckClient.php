@@ -10,10 +10,10 @@ use Endroid\Calendar\Model\CalendarItem;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Uid\Uuid;
 
-final readonly class LeekDuckClient
+final class LeekDuckClient
 {
     public function __construct(
-        private AssetFactory $assetFactory
+        private readonly AssetFactory $assetFactory
     ) {
     }
 
