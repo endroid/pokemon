@@ -19,7 +19,7 @@ final class LeekDuckClient
 
     public function getCalendar(): Calendar
     {
-        $skipCategories = ['GO Battle League', 'Season', 'Research Breakthrough', 'Update'];
+        $skipCategories = ['GO Battle League', 'Season', 'Research Breakthrough', 'Update', 'PokéStop Showcase'];
         $skipTitles = ['Amazon'];
 
         $asset = $this->assetFactory->create(null, [
