@@ -60,12 +60,11 @@ final class LeekDuckClient
                     continue 2;
                 }
             }
-            $dateStart = $crawler->filter('#event-date-start')->innerText();
-            $timeStart = $crawler->filter('#event-time-start')->innerText();
-            $dateEnd = $crawler->filter('#event-date-end')->innerText();
-            $timeEnd = $crawler->filter('#event-time-end')->innerText();
-
             try {
+                $dateStart = $crawler->filter('#event-date-start')->innerText();
+                $timeStart = $crawler->filter('#event-time-start')->innerText();
+                $dateEnd = $crawler->filter('#event-date-end')->innerText();
+                $timeEnd = $crawler->filter('#event-time-end')->innerText();
                 $dateTimeStart = $this->createDateTime($dateStart, $timeStart);
                 $dateTimeEnd = $this->createDateTime($dateEnd, $timeEnd);
 
