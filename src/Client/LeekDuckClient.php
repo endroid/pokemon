@@ -81,12 +81,13 @@ final class LeekDuckClient
     private function createDateTime(string $dateString, string $timeString): \DateTimeImmutable
     {
         $extractedDate = trim($dateString, ',');
-        preg_match('#[0-9]+:[0-9]+ (AM|PM)#', $timeString, $extractedTime);
+        $timeString = str_replace('\u{A0}', '', $timeString);
+        preg_match('#([0-9]+:[0-9]+).*(AM|PM)#', $timeString, $extractedTime);
 
         /** @var \DateTimeImmutable $dateTime */
         $dateTime = \DateTimeImmutable::createFromFormat(
-            'l, F j H:i A',
-            $extractedDate.' '.$extractedTime[0],
+            'l, F j, Y H:i A',
+            $extractedDate.' '.$extractedTime[1].' '.$extractedTime[2],
             new \DateTimeZone('Europe/Amsterdam')
         );
 
