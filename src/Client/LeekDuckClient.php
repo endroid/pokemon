@@ -10,10 +10,10 @@ use Endroid\Calendar\Model\CalendarItem;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Uid\Uuid;
 
-final class LeekDuckClient
+final readonly class LeekDuckClient
 {
     public function __construct(
-        private readonly AssetFactory $assetFactory
+        private AssetFactory $assetFactory,
     ) {
     }
 
@@ -83,6 +83,10 @@ final class LeekDuckClient
         $extractedDate = trim($dateString, ',');
         $timeString = str_replace('\u{A0}', '', $timeString);
         preg_match('#([0-9]+:[0-9]+).*(AM|PM)#', $timeString, $extractedTime);
+
+        if (!isset($extractedTime[1], $extractedTime[2])) {
+            throw new \RuntimeException('Could not extract time');
+        }
 
         /** @var \DateTimeImmutable $dateTime */
         $dateTime = \DateTimeImmutable::createFromFormat(

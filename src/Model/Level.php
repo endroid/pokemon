@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon\Model;
 
-final class Level
+final readonly class Level
 {
     final public const MIN = 1.0;
     final public const MAX = 50.0;
@@ -12,7 +12,7 @@ final class Level
     final public const RAID_BOSS_WEATHER_BOOSTED = 25.0;
 
     public function __construct(
-        public readonly float $value
+        public float $value,
     ) {
         if ($value < self::MIN || $value > self::MAX) {
             throw new \InvalidArgumentException(sprintf('Invalid level "%s"', $value));
@@ -142,7 +142,7 @@ final class Level
             50.0 => 0.84029999,
             50.5 => 0.84279999,
             51.0 => 0.84529999,
-            default => throw new \InvalidArgumentException(sprintf('No CP multiplier found for level "%s"', $this->value))
+            default => throw new \InvalidArgumentException(sprintf('No CP multiplier found for level "%s"', $this->value)),
         };
     }
 }

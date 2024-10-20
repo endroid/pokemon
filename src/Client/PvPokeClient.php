@@ -7,10 +7,10 @@ namespace Endroid\Pokemon\Client;
 use Endroid\Asset\Factory\AssetFactory;
 use Endroid\Pokemon\Model\League;
 
-final class PvPokeClient
+final readonly class PvPokeClient
 {
     public function __construct(
-        private readonly AssetFactory $assetFactory
+        private AssetFactory $assetFactory,
     ) {
     }
 

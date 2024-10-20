@@ -18,7 +18,7 @@ final class Pokemon
         public readonly string $form,
         public readonly array $types,
         public readonly BaseStats $baseStats,
-        public array $leagueInfo = []
+        public array $leagueInfo = [],
     ) {
     }
 

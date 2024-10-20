@@ -6,10 +6,10 @@ namespace Endroid\Pokemon\Client;
 
 use Endroid\Asset\Factory\AssetFactory;
 
-final class PoGoApiClient
+final readonly class PoGoApiClient
 {
     public function __construct(
-        private readonly AssetFactory $assetFactory
+        private AssetFactory $assetFactory,
     ) {
     }
 

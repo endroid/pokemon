@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon\Model;
 
-final class Iv
+final readonly class Iv
 {
     final public const IV_MIN = 0;
     final public const IV_MAX = 15;
 
     public function __construct(
-        public readonly int $value
+        public int $value,
     ) {
         if ($value < self::IV_MIN || $value > self::IV_MAX) {
             throw new \InvalidArgumentException(sprintf('Invalid IV value "%s"', $value));

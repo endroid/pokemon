@@ -12,11 +12,11 @@ use Endroid\Pokemon\Model\League;
 use Endroid\Pokemon\Model\Pokemon;
 use Endroid\Pokemon\Model\Type;
 
-final class PokemonRepository
+final readonly class PokemonRepository
 {
     public function __construct(
-        private readonly PoGoApiClient $poGoApiClient,
-        private readonly PvPokeClient $pvPokeClient
+        private PoGoApiClient $poGoApiClient,
+        private PvPokeClient $pvPokeClient,
     ) {
     }
 

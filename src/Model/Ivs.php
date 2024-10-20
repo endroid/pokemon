@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon\Model;
 
-final class Ivs implements \Stringable
+final readonly class Ivs implements \Stringable
 {
     public function __construct(
-        public readonly Iv $attack,
-        public readonly Iv $defense,
-        public readonly Iv $stamina
+        public Iv $attack,
+        public Iv $defense,
+        public Iv $stamina,
     ) {
     }
 
