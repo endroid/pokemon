@@ -18,12 +18,12 @@ final readonly class Spawn
 
     public function getCp(): int
     {
-        $cpMultiplier = pow($this->level->getCpMultiplier(), 2);
+        $cpMultiplier = $this->level->getCpMultiplier() ** 2;
         $attackFactor = $this->stats->attack;
-        $defenseFactor = pow($this->stats->defense, 0.5);
-        $staminaFactor = pow($this->stats->stamina, 0.5);
+        $defenseFactor = $this->stats->defense ** 0.5;
+        $staminaFactor = $this->stats->stamina ** 0.5;
 
-        return (int) floor($attackFactor * $defenseFactor * $staminaFactor * $cpMultiplier / 10);
+        return (int) floor(($attackFactor * $defenseFactor * $staminaFactor * $cpMultiplier) / 10);
     }
 
     public function getStatProduct(): float

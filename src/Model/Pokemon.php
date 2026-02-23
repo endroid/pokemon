@@ -19,8 +19,7 @@ final class Pokemon
         public readonly array $types,
         public readonly BaseStats $baseStats,
         public array $leagueInfo = [],
-    ) {
-    }
+    ) {}
 
     public function createSpawn(Level $level, Ivs $ivs): Spawn
     {
@@ -45,7 +44,7 @@ final class Pokemon
                 if ($ivs->defense->value < 11 || $ivs->stamina->value < 11) {
                     continue;
                 }
-                if ($ivs->attack->value > $ivs->defense->value || $ivs->attack->value > $ivs->stamina->value) {
+                if ($ivs->attack->value > $ivs->defense->value) {
                     continue;
                 }
                 $spawn = new Spawn($this, $level, $ivs);

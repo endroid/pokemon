@@ -10,9 +10,9 @@ final readonly class Ivs implements \Stringable
         public Iv $attack,
         public Iv $defense,
         public Iv $stamina,
-    ) {
-    }
+    ) {}
 
+    /** @return \Generator<int, Ivs> */
     public static function all(): \Generator
     {
         foreach (Iv::all() as $attack) {
@@ -29,8 +29,9 @@ final readonly class Ivs implements \Stringable
         return new self(Iv::max(), Iv::max(), Iv::max());
     }
 
+    #[\Override]
     public function __toString(): string
     {
-        return $this->attack->value.'-'.$this->defense->value.'-'.$this->stamina->value;
+        return $this->attack->value . '-' . $this->defense->value . '-' . $this->stamina->value;
     }
 }

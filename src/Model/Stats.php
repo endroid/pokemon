@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Endroid\Pokemon\Model;
 
-final readonly class Stats
+final class Stats
 {
-    public int $attack;
-    public int $defense;
-    public int $stamina;
+    public int $attack {
+        get => $this->baseStats->attack + $this->ivs->attack->value;
+    }
+    public int $defense {
+        get => $this->baseStats->defense + $this->ivs->defense->value;
+    }
+    public int $stamina {
+        get => $this->baseStats->stamina + $this->ivs->stamina->value;
+    }
 
     public function __construct(
-        public BaseStats $baseStats,
-        public Ivs $ivs,
-    ) {
-        $this->attack = $this->baseStats->attack + $this->ivs->attack->value;
-        $this->defense = $this->baseStats->defense + $this->ivs->defense->value;
-        $this->stamina = $this->baseStats->stamina + $this->ivs->stamina->value;
-    }
+        public readonly BaseStats $baseStats,
+        public readonly Ivs $ivs,
+    ) {}
 }

@@ -17,41 +17,49 @@ final readonly class PokemonRepository
     public function __construct(
         private PoGoApiClient $poGoApiClient,
         private PvPokeClient $pvPokeClient,
-    ) {
-    }
+    ) {}
 
     public function findAll(): PokemonCollection
     {
         $releasedPokemon = $this->poGoApiClient->getReleasedPokemon();
         $pokemonStats = $this->poGoApiClient->getPokemonStats();
-        $pokemonTypes = array_column($this->poGoApiClient->getPokemonTypes(), 'type', 'pokemon_id');
+        /** @var list<array{pokemon_id: int, type: array<string>}> $pokemonTypesData */
+        $pokemonTypesData = $this->poGoApiClient->getPokemonTypes();
+        /** @var array<int, array<string>> $pokemonTypes */
+        $pokemonTypes = array_column($pokemonTypesData, 'type', 'pokemon_id');
 
         $pokemonCollection = new PokemonCollection();
+        /** @var array{pokemon_id: int, pokemon_name: string, form: string, base_attack: int, base_defense: int, base_stamina: int} $pokemonData */
         foreach ($pokemonStats as $pokemonData) {
-            if (!isset($releasedPokemon[$pokemonData['pokemon_id']])) {
+            if (!array_key_exists($pokemonData['pokemon_id'], $releasedPokemon)) {
                 continue;
             }
-            $pokemonCollection->add(new Pokemon(
-                $pokemonData['pokemon_id'],
-                $pokemonData['pokemon_name'],
-                str_replace(['_', 'Alola'], [' ', 'Alolan'], $pokemonData['form']),
-                array_map(fn (string $type) => Type::from(strtolower($type)), $pokemonTypes[$pokemonData['pokemon_id']]),
-                new BaseStats(
-                    $pokemonData['base_attack'],
-                    $pokemonData['base_defense'],
-                    $pokemonData['base_stamina']
+            $pokemonCollection->add(
+                new Pokemon(
+                    $pokemonData['pokemon_id'],
+                    $pokemonData['pokemon_name'],
+                    str_replace(['_', 'Alola'], [' ', 'Alolan'], $pokemonData['form']),
+                    array_map(static fn(string $type) => Type::from(strtolower(
+                        $type,
+                    )), $pokemonTypes[$pokemonData['pokemon_id']]),
+                    new BaseStats(
+                        $pokemonData['base_attack'],
+                        $pokemonData['base_defense'],
+                        $pokemonData['base_stamina'],
+                    ),
                 ),
-            ));
+            );
         }
 
         $pokemonCollection->removeDuplicates();
 
         foreach (League::cases() as $league) {
             $rankings = $this->pvPokeClient->getRankingsForLeague($league, 100);
-            foreach ($rankings as $index => $ranking) {
+            /** @var array{speciesName: string, score: float} $ranking */
+            foreach (array_values($rankings) as $index => $ranking) {
                 $nameParts = explode(' (', $ranking['speciesName']);
                 $name = $nameParts[0];
-                $form = isset($nameParts[1]) ? trim($nameParts[1], ')') : 'normal';
+                $form = array_key_exists(1, $nameParts) ? trim($nameParts[1], characters: ')') : 'normal';
                 if ('Shadow' === $form) {
                     continue;
                 }
@@ -62,7 +70,7 @@ final readonly class PokemonRepository
                         'score' => $ranking['score'],
                     ];
                 } catch (NotFoundException) {
-                    // Skip the item
+                    continue;
                 }
             }
         }

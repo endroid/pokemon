@@ -15,7 +15,7 @@ enum League: string
         return match ($this) {
             self::Great => 1500,
             self::Ultra => 2500,
-            self::Master => 10000,
+            self::Master => 10_000,
         };
     }
 }

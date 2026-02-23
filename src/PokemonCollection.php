@@ -9,7 +9,7 @@ use Endroid\Pokemon\Model\BaseStats;
 use Endroid\Pokemon\Model\Pokemon;
 
 /**
- * @phpstan-implements \IteratorAggregate<Pokemon>
+ * @implements \IteratorAggregate<int, Pokemon>
  */
 final class PokemonCollection implements \IteratorAggregate
 {
@@ -18,20 +18,22 @@ final class PokemonCollection implements \IteratorAggregate
 
     public function add(Pokemon $pokemon): void
     {
-        $this->pokemonByNameAndForm[$this->createNameKey($pokemon->name)][$this->createFormKey($pokemon->form)] = $pokemon;
+        $this->pokemonByNameAndForm[$this->createNameKey($pokemon->name)][$this->createFormKey($pokemon->form)] =
+            $pokemon;
     }
 
     public function removeDuplicates(): void
     {
         foreach ($this->pokemonByNameAndForm as &$pokemonByForm) {
             $ivs = null;
-            uasort($pokemonByForm, fn (Pokemon $a, Pokemon $b) => 'Normal' === $b->form ? 1 : -1);
+            uasort($pokemonByForm, static fn(Pokemon $_a, Pokemon $b) => 'Normal' === $b->form ? 1 : -1);
             foreach ($pokemonByForm as $form => $pokemon) {
                 if ($ivs instanceof BaseStats && $pokemon->baseStats->equals($ivs)) {
                     unset($pokemonByForm[$form]);
-                } else {
-                    $ivs = $pokemon->baseStats;
+                    continue;
                 }
+
+                $ivs = $pokemon->baseStats;
             }
         }
     }
@@ -47,6 +49,7 @@ final class PokemonCollection implements \IteratorAggregate
         return $pokemon;
     }
 
+    #[\Override]
     public function getIterator(): \Generator
     {
         foreach ($this->pokemonByNameAndForm as $pokemonByForm) {
@@ -58,13 +61,13 @@ final class PokemonCollection implements \IteratorAggregate
 
     private function createNameKey(string $name): string
     {
-        return (string) preg_replace('#[^a-z]#', '', strtolower($name));
+        return (string) preg_replace('#[^a-z]#', replacement: '', subject: strtolower($name));
     }
 
     private function createFormKey(string $form): string
     {
-        $key = preg_replace('#[^a-z]#', '', strtolower($form));
+        $key = preg_replace('#[^a-z]#', replacement: '', subject: strtolower($form));
 
-        return (string) preg_replace(['#^alola$#'], ['alolan'], (string) $key);
+        return (string) preg_replace(['#^alola$#'], replacement: ['alolan'], subject: (string) $key);
     }
 }

@@ -10,8 +10,7 @@ final readonly class PoGoApiClient
 {
     public function __construct(
         private AssetFactory $assetFactory,
-    ) {
-    }
+    ) {}
 
     /** @return array<mixed> */
     public function getPokemonStats(): array
@@ -41,12 +40,13 @@ final readonly class PoGoApiClient
     public function doRequest(string $path): array
     {
         $cacheAsset = $this->assetFactory->create(null, [
-            'url' => 'https://pogoapi.net/api/v1/'.$path.'.json',
-            'cache_key' => 'pokemon-'.str_replace('_', '-', $path),
-            'cache_expires_after' => 86400,
+            'url' => 'https://pogoapi.net/api/v1/' . $path . '.json',
+            'cache_key' => 'pokemon-' . str_replace('_', replace: '-', subject: $path),
+            'cache_expires_after' => 86_400,
         ]);
 
-        $responseData = json_decode($cacheAsset->getData(), true);
+        /** @var array<mixed>|null $responseData */
+        $responseData = json_decode($cacheAsset->getData(), associative: true);
 
         if (!is_array($responseData)) {
             throw new \RuntimeException(sprintf('Could not fetch %s data', $path));

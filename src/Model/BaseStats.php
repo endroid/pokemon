@@ -10,13 +10,14 @@ final readonly class BaseStats
         public int $attack,
         public int $defense,
         public int $stamina,
-    ) {
-    }
+    ) {}
 
     public function equals(BaseStats $baseStats): bool
     {
-        return $this->attack === $baseStats->attack
+        return (
+            $this->attack === $baseStats->attack
             && $this->defense === $baseStats->defense
-            && $this->stamina === $baseStats->stamina;
+            && $this->stamina === $baseStats->stamina
+        );
     }
 }

@@ -14,8 +14,7 @@ final readonly class LeekDuckClient
 {
     public function __construct(
         private AssetFactory $assetFactory,
-    ) {
-    }
+    ) {}
 
     public function getCalendar(): Calendar
     {
@@ -30,16 +29,19 @@ final readonly class LeekDuckClient
 
         $crawler = new Crawler($asset->getData());
 
-        $eventUrls = $crawler->filter('.event-item-link')->each(function (Crawler $node) use ($skipCategories) {
-            $category = $node->filter('p')->innerText();
-            foreach ($skipCategories as $skipCategory) {
-                if (strtolower($skipCategory) === strtolower($category)) {
+        $eventUrls = $crawler
+            ->filter('.event-item-link')
+            ->each(static function (Crawler $node) use ($skipCategories) {
+                $category = $node->filter('p')->innerText();
+                if (array_any(
+                    $skipCategories,
+                    static fn(string $skipCategory) => strtolower($skipCategory) === strtolower($category),
+                )) {
                     return null;
                 }
-            }
 
-            return 'https://leekduck.com'.$node->attr('href');
-        });
+                return 'https://leekduck.com' . (string) $node->attr('href');
+            });
 
         $eventUrls = array_unique(array_filter($eventUrls));
 
@@ -49,16 +51,15 @@ final readonly class LeekDuckClient
             'cache_expires_after' => 8640,
         ]);
 
+        /** @var array<string, string> $assetData */
         $assetData = unserialize($asset->getData());
 
         $events = [];
         foreach ($eventUrls as $assetUrl) {
             $crawler = new Crawler($assetData[$assetUrl]);
             $title = $crawler->filter('.page-title')->innerText();
-            foreach ($skipTitles as $skipTitle) {
-                if (str_contains($title, $skipTitle)) {
-                    continue 2;
-                }
+            if (array_any($skipTitles, static fn(string $skipTitle) => str_contains($title, $skipTitle))) {
+                continue;
             }
             try {
                 $dateStart = $crawler->filter('#event-date-start')->innerText();
@@ -68,10 +69,11 @@ final readonly class LeekDuckClient
                 $dateTimeStart = $this->createDateTime($dateStart, $timeStart);
                 $dateTimeEnd = $this->createDateTime($dateEnd, $timeEnd);
 
-                if ($dateTimeStart->diff($dateTimeEnd)->days < 25) {
+                if ((int) $dateTimeStart->diff($dateTimeEnd)->days < 25) {
                     $events[] = new CalendarItem((string) Uuid::v6(), $title, $assetUrl, $dateTimeStart, $dateTimeEnd);
                 }
             } catch (\Throwable) {
+                continue;
             }
         }
 
@@ -80,20 +82,24 @@ final readonly class LeekDuckClient
 
     private function createDateTime(string $dateString, string $timeString): \DateTimeImmutable
     {
-        $extractedDate = trim($dateString, ',');
-        $timeString = str_replace('\u{A0}', '', $timeString);
+        $extractedDate = trim($dateString, characters: ',');
+        $timeString = str_replace('\u{A0}', replace: '', subject: $timeString);
+        $extractedTime = [];
         preg_match('#([0-9]+:[0-9]+).*(AM|PM)#', $timeString, $extractedTime);
 
-        if (!isset($extractedTime[1], $extractedTime[2])) {
+        if (!array_key_exists(1, $extractedTime) || !array_key_exists(2, $extractedTime)) {
             throw new \RuntimeException('Could not extract time');
         }
 
-        /** @var \DateTimeImmutable $dateTime */
         $dateTime = \DateTimeImmutable::createFromFormat(
             'l, F j, Y H:i A',
-            $extractedDate.' '.$extractedTime[1].' '.$extractedTime[2],
-            new \DateTimeZone('Europe/Amsterdam')
+            $extractedDate . ' ' . $extractedTime[1] . ' ' . $extractedTime[2],
+            new \DateTimeZone('Europe/Amsterdam'),
         );
+
+        if (!$dateTime instanceof \DateTimeImmutable) {
+            throw new \RuntimeException('Could not parse date time');
+        }
 
         return $dateTime;
     }
