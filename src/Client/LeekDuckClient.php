@@ -56,7 +56,11 @@ final readonly class LeekDuckClient
 
         $events = [];
         foreach ($eventUrls as $assetUrl) {
-            $crawler = new Crawler($assetData[$assetUrl]);
+            $eventData = $assetData[$assetUrl] ?? throw new \RuntimeException(sprintf(
+                'Missing event data for "%s"',
+                $assetUrl,
+            ));
+            $crawler = new Crawler($eventData);
             $title = $crawler->filter('.page-title')->innerText();
             if (array_any($skipTitles, static fn(string $skipTitle) => str_contains($title, $skipTitle))) {
                 continue;

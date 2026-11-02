@@ -11,7 +11,7 @@ final readonly class Level
     final public const float RAID_BOSS = 20.0;
     final public const float RAID_BOSS_WEATHER_BOOSTED = 25.0;
 
-    /** @var array<string, float> */
+    /** @var array<int|string, float> */
     private const array CP_MULTIPLIERS = [
         '1' => 0.094,
         '1.5' => 0.135_137_431_8,

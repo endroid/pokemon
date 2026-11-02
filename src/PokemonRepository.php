@@ -25,7 +25,6 @@ final readonly class PokemonRepository
         $pokemonStats = $this->poGoApiClient->getPokemonStats();
         /** @var list<array{pokemon_id: int, type: array<string>}> $pokemonTypesData */
         $pokemonTypesData = $this->poGoApiClient->getPokemonTypes();
-        /** @var array<int, array<string>> $pokemonTypes */
         $pokemonTypes = array_column($pokemonTypesData, 'type', 'pokemon_id');
 
         $pokemonCollection = new PokemonCollection();
@@ -34,14 +33,17 @@ final readonly class PokemonRepository
             if (!array_key_exists($pokemonData['pokemon_id'], $releasedPokemon)) {
                 continue;
             }
+            $types = $pokemonTypes[$pokemonData['pokemon_id']] ?? throw new \RuntimeException(sprintf(
+                'Missing types for Pokemon "%s"',
+                $pokemonData['pokemon_id'],
+            ));
+
             $pokemonCollection->add(
                 new Pokemon(
                     $pokemonData['pokemon_id'],
                     $pokemonData['pokemon_name'],
                     str_replace(['_', 'Alola'], [' ', 'Alolan'], $pokemonData['form']),
-                    array_map(static fn(string $type) => Type::from(strtolower(
-                        $type,
-                    )), $pokemonTypes[$pokemonData['pokemon_id']]),
+                    array_map(static fn(string $type) => Type::from(strtolower($type)), $types),
                     new BaseStats(
                         $pokemonData['base_attack'],
                         $pokemonData['base_defense'],
